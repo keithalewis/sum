@@ -1,43 +1,25 @@
-# Prerequisites
-*.d
+# Scala / JVM build outputs
+target/
+out/
+project/target/
+project/project/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Scala CLI / BSP / Metals / Bloop
+.scala-build/
+.bsp/
+.metals/
+.bloop/
 
-# Precompiled Headers
-*.gch
-*.pch
+# IDE and editor settings
+.idea/
+.vs/
 
-# Linker files
-*.ilk
+# Optional: keep if you do not want workspace settings in git
+.vscode/
 
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
-/.vs/sum/CopilotIndices
-/.vs/sum
+# OS and temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
