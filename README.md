@@ -1,6 +1,8 @@
 ﻿# Simple Universal Model
 
-Let $\Omega$ be the set of possible outcomes and $𝒜_t$ be the information available at time $t$.
+Let $T$ be a finite totally ordered set of _trading times_,
+$I$ a finite set of _market instruments_,
+$\Omega$ be the set of possible outcomes, and $𝒜_t$ be the information available at time $t$.
 
 Let $I$ be the set of market instruments and $X_t, C_t\colon 𝒜_t \to ℝ^I$ 
 be their price and cash flow processes, respectively.
