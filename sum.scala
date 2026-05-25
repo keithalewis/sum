@@ -12,5 +12,23 @@ def partitionBy[A, K](s: Set[A])(f: A => K): Set[Set[A]] =
 def classesByKey[A, K](s: Set[A])(f: A => K): Map[K, Set[A]] =
   s.groupBy(f).view.mapValues(_.toSet).toMap
 
+extension [A, B](f: A => B)
+  def zipWith(g: A => B)(op: (B, B) => B): A => B =
+    a => op(f(a), g(a))
+
+// val h2 = f.zipWith(g)(_ + _)
+
+import scala.annotation.targetName
+
+extension [A, B](f: A => B)
+// JVM name for interop
+@targetName("pointwiseCombine")
+infix def <+>(g: A => B)(using op: (B, B) => B): A => B =
+a => op(f(a), g(a))
+
+//Common symbols you can use in operator names include:
+
+//+ - * / % ^ & | ! = < > : ? ~ \
+
 @main def run(): Unit =
   println(choose(50, 30))
