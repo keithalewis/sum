@@ -1,3 +1,8 @@
+
+// 0, 1, 2, ...
+def Time() = Iterator.from(0)
+
+/*
 def choose(n: Int, k: Int): BigInt = {
   require(n >= 0 && k >= 0 && k <= n, "need 0 <= k <= n")
   val kk = math.min(k, n - k) // use symmetry to reduce work
@@ -27,8 +32,8 @@ infix def <+>(g: A => B)(using op: (B, B) => B): A => B =
 a => op(f(a), g(a))
 
 //Common symbols you can use in operator names include:
-
 //+ - * / % ^ & | ! = < > : ? ~ \
 
 @main def run(): Unit =
   println(choose(50, 30))
+*/
