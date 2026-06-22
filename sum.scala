@@ -8,10 +8,10 @@ object Time:
   extension (t: Time)
     def value: Int = t
 
-def choose(n: Int, k: Int): BigInt = {
+def choose(n: Int, k: Int): Int = {
   require(n >= 0 && k >= 0 && k <= n, "need 0 <= k <= n")
   val j = math.min(k, n - k) // use symmetry to reduce work
-  (1 to j).foldLeft(BigInt(1)) { (acc, i) =>
+  (1 to j).foldLeft(1) { (acc, i) =>
     acc * (n - j + i) / i
   }
 }
@@ -28,9 +28,39 @@ def dot[A: Numeric, B: Numeric](xs: Seq[A], ys: Seq[B]): Double =
     .map((x, y) => na.toDouble(x) * nb.toDouble(y))
     .sum
 
+/**
+  * Atom representing V_t = v.
+  */
+case class Atom(t: Time, v: Int)
+
+type Function = Atom => Double
+
+type Measure = Atom => Double
+
+// One-sided random walk
+def D(t: Time): Function = {
+  (A: Atom) => choose(A.t.value, A.v) * math.pow(0.5, A.t.value)
+}
+
+type Filtration = Time => Seq[Atom]
+
+def Entails(E: Atom, u: Time): Seq[Atom] = {
+  // require E is an atom of A_t, and t < u
+  // returns the atoms of A_u that entail E at time u
+  (E.v to E.v + u - E.t).map(k => Atom(t = u, v = k)).toSeq
+}
+
+def value(E: Atom, u: Time, A: Function, D: Measure): Double = {
+  // require E is an atom of A_t, and t < u
+  Entails(E, u).iterator.map(e => A(e) * D(e)).sum // sum over atoms of A_u that entail E at time u
+}
+
 @main def run(): Unit =
   println(choose(50, 30))
   println(dot(Seq(1, 2, 3), Seq(4.0, 5.0, 6.0)))
+
+  var v = Entails(Atom(t = Time(2), v = 1), Time(4))
+  v.map(x => println(s"Entails: t=${x.t.value}, v=${x.v}"))
 
 /*
 

@@ -1,4 +1,4 @@
-# Simple Unified Model
+﻿# Simple Unified Model
 
 How to value, hedge, and manage the risk of _any_
 collection of instruments.
@@ -12,7 +12,7 @@ requires a framework for understanding the correlation between these.
 A common approach is to specify a copula. The Gaussian copula
 led to the infamous 2008 debacle in structured credit markets.
 
-Stephan Ross showed the way. This project extends his work by
+Stephan Ross poinnted the way. This project extends his work by
 adding an explicit knob for cash flows.
 
 For full details see https://keithalewis.github.io/math/sum.html
@@ -26,7 +26,13 @@ available at https://kalx.net/sum.html.
 
 Let $T$ be a finite totally ordered set of _trading times_,
 $I$ a finite set of _market instruments_,
-$\Omega$ be the finite set of possible outcomes, and $(𝒜_t)$ be partitions of $\Omega$ representing information available at time $t\in T$.
+$\Omega$ be the finite set of possible outcomes, and $(𝒜_t)_{t\in T}$ be partitions of $\Omega$ representing information available at time $t\in T$.
+
+We require for every $B\in 𝒜_t$ that $B = \cup\{A\subseteq B\mid A\in 𝒜_u\}$ when $u > t$.
+This is weaker than the usual requirement that the algebras are refinements.
+
+Recall $\tau\colon\Omega\to T$ is a stopping time if $\{\tau = t\}$ is a
+union of atoms from $𝒜_t$.
 
 We assume everything is finite since that is the case when implementing
 models on a computer.
@@ -53,21 +59,8 @@ exactly.
 
 ### Trading
 
-<<<<<<< HEAD
-We let $\Omega_\Gamma = (𝒁^I)^T$ be the set of
-all functions from $T$ to the integers
-indexed by instruments.
-The point $(t,\gamma)$ represents the number of shares
-traded at time $t$.
-The number of shares of instrument $i$, $\Gamma_t(i)$,
-is $\gamma(i)$ times the minimum share increment of instrument $i$.
-=======
 A trading strategy is a finite number of
 increasing stopping times $\tau_0 < \cdots < \tau_n$ and functions $\Gamma_j\colon 𝒜_{\tau_j}\to R^I$.
-
-A stopping time is a function $\tau\colon\Omega\to T$ where
-$\{\tau = t\} = \{\omega\in\Omega\mid \tau(\omega) = t\}$ is a union of atoms
-of $𝒜_t$. The partition $𝒜_\tau = \{\{\tau = t\}\mid t\in T\}$.
 
 Trades accumulate into a position
 $\Delta_t = \sum_{\tau_j < t} \Gamma_j
@@ -75,14 +68,8 @@ $\Delta_t = \sum_{\tau_j < t} \Gamma_j
 $\Gamma_s = \Gamma_j$ if $s = \tau_j$, and
 is zero otherwise.
 Note the strict inequality. It takes some time for trades to settle.
->>>>>>> f9291d82c195b22c5d6520757b82040c054b1961
 
-A trading strategy is an increasing sequence of stopping times $\tau_j$
-and number of shares to trade $\Gamma_j\colon 𝒜_{\tau_j} \to 𝒁^I$.
-
-The position at time $t$ is
-$\Delta_t = \sum_{\tau_j < t} \Gamma_j = \sum_{s < t} \Gamma_s$
-where $\Gamma_s = \Gamma_j$ if $s = \tau_j$ for some $j$ and 0 otherwise.
+A trading strategy is _closed out_ if $\sum_j \Gamma_j = 0$.
 
 ### Accounting
 
@@ -101,18 +88,19 @@ Arbitrage exists (in this model) if there is a trading strategy
 $(\tau_j, \Gamma_j)$ with $A_{\tau_0} > 0$,
 $A_t \ge 0$ for $t > \tau_0$, and $\sum_j \Gamma_j = 0$.
 You make money on the first trade, never lose money after that,
-and eventually close out. This rules out
-Nick Leeson strategies.
+and eventually close out. 
 
 Note this definition of arbitrage does not involve probability.
 
 Every arbitrage-free model has the form 
 $$
-X_t D_t = M_t - \sum_{s < t} C_s D_s|{𝒜_t},
+X_t D_t = X_0 M_t - \sum_{s \le t} (C_s D_s)|{𝒜_t},
 $$
 where $M_t$ is a vector-valued martingale measure
 ($M_t = M_u|𝒜_t$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
-$D_t\in ba(𝒜_t)$.
+$D_t\in ba(𝒜_t)$. If a money market account is available then $D_t$ can
+be chosen to be the reciprocal of its price. This is typically referred
+to as the stochastic discount.
 
 This implies
 
@@ -153,9 +141,7 @@ for all $t\in T$. [^1]
 [^1]: In general this is not possible. An area for future research
 is to find trading strategies making the difference
 white noise with minimum variance a la
-Markowitz but incorporating the Nobel
-price Scholes and Merton won showing
-you do not 
+Markowitz.
 
 Since $V_t = (\Delta_t + \Gamma_t)\cdot X_t$ we have the
 Fréchet derivative $D_{X_t} V_t = \Delta_t + \Gamma_t$.
@@ -163,7 +149,9 @@ Since the position at time 0 is $\Delta_0 = 0$ this gives us
 our first trade $\Gamma_0 = D_{X_0} V_0$.
 At times greater than 0 we have $\Gamma_t = D_{X_t} V_t - \Delta_t$.
 Since $\Delta_t$ is the accumulation of prior trades, 
-this determined $\Gamma_t$. What this _does not_ determine is
+this determined $\Gamma_t$. 
+
+What this _does not_ determine is
 when to trade. If we trade at positive integral multiples of some
 fixed $\Delta t$ and let $\Delta t \to 0$ then we get the usual
 Black-Scholes/Merton continuous time delta hedging strategy.
@@ -174,50 +162,18 @@ The value at time $t$ of an option paying
 $A_\tau$ at stopping time $\tau$ is determined
 by 
 $$
-V_t D_t = (A_\tau D_\tau 1(\tau > t))|_{𝒜_t}
+V_t D_t = (1(\tau > t) A_\tau D_\tau)|_{𝒜_t}
 $$
 
-A stopping time is a function $\tau\colon\Omega\to T$
-where $\{\tau = t\}$ is in the algebra of sets generated by the
-atoms of 𝒜_t$ for $t\in T$.
-
-We have for $A\in 𝒜_t$
+So for $E\in 𝒜_t$ we have
 $$
-(V_t D_t)(A) = \sum_{u > t} \sum_{B\subseteq A\cap\{\tau = u\}} A_u(B) D_u(B)
+(V_t D_t)(E) = \sum_{u > t} \sum_{F\subseteq E\cap\{\tau = u\}} A_u(F) D_u(F)
 $$
 
-The main concern with implementation is how to define the
-sample space $\Omega$ and partitions $𝒜_t$, $t\in T$, of partial information.D
-
-If $S$ has $n$ elements then $B(S)$ is isomorphic to $𝑹^n$.
-Since $n$ is finite, the dual $(𝑹^n)^*$ is isomorphic to $𝑹^n$.
-The space of finitely additive measures on $S$, $ba(S)$ is isomorphic
-to the dual $B(S)^*$. 
+Given $E\in 𝒜_t$ and $u > t$ we need to produce the collections
+$$
+\{F\in 𝒜_u\mid F\subset E\cap\{\tau = u\}\}
+$$
+to calculate the sum/product.
 
 
-The main concern with implementation is how to define the
-partitions $𝒜_t$, $t\in T$, of partial information. We require
-every atom of $𝒜_t$ must be a union of atoms of $𝒜_{t+1}$.
-This is not the same as the usual requirement that the
-algebra of atoms generated by $𝒜_t$ be a subalgebra of
-the algebra of atoms generated by $𝒜_{t+1}$.
-
-Assume $T = \{0, 1, \ldots, t\}$. Let $𝒜_t$ be any set.
-Recall if $f\colon A\to B$ is an onto function then $\text{ker}\, f$ is a partition of $A$.
-
-Define onto functions $𝒜_s\colon\Omega\to 𝒜_{s + 1}$ for each $s\in T$. We identify $𝒜_s$ with its kernel.
-
-For example, the one-directional random walk can be defined
-by $T = \{0,1,\ldots,n\} = 𝒜_n$ and
-$𝒜_s\colon\Omega\to 𝒜_{s + 1}$ by
-
-by $T = \{0,1,\ldots,n\} = 𝒜_n$ and
-
-Stopping time sequence (t, A) where A is a sequence of atoms in 𝒜_t
-
-$M_\tau|𝒜_t$
-
-```
-value(Partition<Omega> A, StoppingTime tau)
-
-```
