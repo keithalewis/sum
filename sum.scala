@@ -19,14 +19,7 @@ def choose(n: Int, k: Int): Int = {
 // 0, 1, 2, ...
 //def Time() = Iterator.from(0)
 
-def dot[A: Numeric, B: Numeric](xs: Seq[A], ys: Seq[B]): Double =
-  require(xs.length == ys.length, "dot: sequences must have the same length")
-  val na = summon[Numeric[A]]
-  val nb = summon[Numeric[B]]
-  xs.iterator
-    .zip(ys.iterator)
-    .map((x, y) => na.toDouble(x) * nb.toDouble(y))
-    .sum
+
 
 /**
   * Atom representing V_t = v.
@@ -37,30 +30,40 @@ type Function = Atom => Double
 
 type Measure = Atom => Double
 
+type Filtration = Time => Iterable[Atom]
+
+type StoppingTime = Seq[(Time, Iterable[Atom])]
+
 // One-sided random walk
 def D(t: Time): Function = {
   (A: Atom) => choose(A.t.value, A.v) * math.pow(0.5, A.t.value)
 }
 
-type Filtration = Time => Seq[Atom]
-
-def Entails(E: Atom, u: Time): Seq[Atom] = {
+// Atoms of A_u contained in E.
+def Atoms(E: Atom, u: Time): Iterable[Atom] = {
   // require E is an atom of A_t, and t < u
   // returns the atoms of A_u that entail E at time u
-  (E.v to E.v + u - E.t).map(k => Atom(t = u, v = k)).toSeq
+  (E.v to E.v + u - E.t).map(k => Atom(t = u, v = k)).toIterable
 }
 
-def value(E: Atom, u: Time, A: Function, D: Measure): Double = {
+// (A_u D_u)|A_t
+def Value(u: Time, A: Function, D: Measure): Measure = {
   // require E is an atom of A_t, and t < u
-  Entails(E, u).iterator.map(e => A(e) * D(e)).sum // sum over atoms of A_u that entail E at time u
+  (E: Atom) => Atoms(E, u).iterator.map(e => A(e) * D(e)).sum // sum over atoms of A_u that entail E at time u
 }
+
+// (1(tau > t) A_tau D_tau)|A_t
 
 @main def run(): Unit =
-  println(choose(50, 30))
-  println(dot(Seq(1, 2, 3), Seq(4.0, 5.0, 6.0)))
+  println(choose(5, 3))
 
-  var v = Entails(Atom(t = Time(2), v = 1), Time(4))
-  v.map(x => println(s"Entails: t=${x.t.value}, v=${x.v}"))
+  var atoms = Atoms(Atom(t = Time(2), v = 1), Time(4))
+  atoms.map(x => println(s"Atoms: t=${x.t.value}, v=${x.v}"))
+  var d = D(Time(4))(Atom(t = Time(4), v = 2))
+  println(s"D(4)(Atom(4,2)) = $d")
+  def A(a: Atom): Double = a.v.toDouble
+  var value = Value(Time(4), A, D)
+  println(value(Atom(t = Time(2), v = 1)))
 
 /*
 
