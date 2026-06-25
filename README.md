@@ -93,7 +93,7 @@ Note this definition of arbitrage does not involve probability.
 
 Every arbitrage-free model has the form 
 $$
-X_t D_t = X_0 M_t - \sum_{s \le t} (C_s D_s)|{𝒜_t},
+X_t D_t = X_0 M_t - \sum_{s \le t} (C_s D_s)|_{𝒜_t},
 $$
 where $M_t$ is a vector-valued martingale measure
 ($M_t = M_u|𝒜_t$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
