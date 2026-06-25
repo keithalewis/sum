@@ -62,9 +62,8 @@ exactly.
 A trading strategy is a finite number of
 increasing stopping times $\tau_0 < \cdots < \tau_n$ and functions $\Gamma_j\colon 𝒜_{\tau_j}\to R^I$.
 
-Trades accumulate into a position
-$\Delta_t = \sum_{\tau_j < t} \Gamma_j
-= \sum_{s < t} \Gamma_s$ where
+Trades accumulate into a position 
+$\Delta_t = \sum_{\tau_j < t} \Gamma_j = \sum_{s < t} \Gamma_s$ where
 $\Gamma_s = \Gamma_j$ if $s = \tau_j$, and
 is zero otherwise.
 Note the strict inequality. It takes some time for trades to settle.
