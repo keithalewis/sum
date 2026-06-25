@@ -1,11 +1,7 @@
-
-
-
-
 # Simple Unified Model
 
 How to value, hedge, and manage the risk of _any_
-collection of instruments. $\mathcal{A}$.  
+collection of instruments. $\AA$.  
 
 There is a huge, unsolved problem in finance: How to value, hedge, and
 manage the risk of portfolios of any collection of instruments.
