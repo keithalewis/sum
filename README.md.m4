@@ -96,7 +96,7 @@ $$
 X_t D_t = X_0 M_t - \sum_{s \le t} (C_s D_s)|_{\mathcal{A}_t},
 $$
 where $M_t$ is a vector-valued martingale measure
-($M_t = M_u|\AA_t$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
+($M_t = M_u|_{\AA_t}$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
 $D_t\in ba(\AA_t)$. If a money market account is available then $D_t$ can
 be chosen to be the reciprocal of its price. This is typically referred
 to as the stochastic discount.
