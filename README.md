@@ -1,22 +1,16 @@
-
-
-
-
 # Simple Unified Model
 
 How to value, hedge, and manage the risk of _any_
-collection of instruments. $\mathcal{A}$.  
+collection of instruments.   
 
 There is a huge, unsolved problem in finance: How to value, hedge, and
 manage the risk of portfolios of any collection of instruments.
 Historically, banks and hedge funds have desks dedicated to
 each product area such as
 equities, fixed income, commodities, FX, etc. The modern world
-requires a framework for understanding the correlation between these.
-A common approach is to specify a copula. The Gaussian copula
-led to the infamous 2008 debacle in structured credit markets.
+requires a framework for modeling the correlation between these.
 
-Stephan Ross poinnted the way. This project extends his work by
+Stephan Ross pointed the way. This project extends his work by
 adding an explicit knob for cash flows.
 
 For full details see https://keithalewis.github.io/math/sum.html
@@ -30,13 +24,13 @@ available at https://kalx.net/sum.html.
 
 Let $T$ be a finite totally ordered set of _trading times_,
 $I$ a finite set of _market instruments_,
-$\Omega$ be the finite set of possible outcomes, and $(\AA_t)_{t\in T}$ be partitions of $\Omega$ representing information available at time $t\in T$.
+$\Omega$ be the finite set of possible outcomes, and $(\mathcal{A}_t)_{t\in T}$ be partitions of $\Omega$ representing information available at time $t\in T$.
 
-We require for every $B\in \AA_t$ that $B = \cup\{A\subseteq B\mid A\in \AA_u\}$ when $u > t$.
+We require for every $B\in \mathcal{A}_t$ that $B = \cup\{A\subseteq B\mid A\in \mathcal{A}_u\}$ when $u > t$.
 This is weaker than the usual requirement that the algebras are refinements.
 
 Recall $\tau\colon\Omega\to T$ is a stopping time if $\{\tau = t\}$ is a
-union of atoms from $\AA_t$.
+union of atoms from $\mathcal{A}_t$.
 
 We assume everything is finite since that is the case when implementing
 models on a computer.
@@ -45,7 +39,7 @@ models on a computer.
 
 The prices of instruments at
 time $t\in T$ are a function
-$X_t\colon \AA_t\to R^I$, where $R$ is
+$X_t\colon \mathcal{A}_t\to R^I$, where $R$ is
 typically an IEEE 754 floating point number.
 A better choice is to let $R$ be an integral
 type to be multiplied by each instruments
@@ -56,7 +50,7 @@ prices exactly.
 
 The cash flows of instruments at
 time $t\in T$ are a function
-$C_t\colon \AA_t\to R^I$.
+$C_t\colon \mathcal{A}_t\to R^I$.
 We can let $R$ be an integral type to
 be multiplied by each instruments minimum cash flow increment to model possible cash flows
 exactly.
@@ -64,7 +58,7 @@ exactly.
 ### Trading
 
 A trading strategy is a finite number of
-increasing stopping times $\tau_0 < \cdots < \tau_n$ and functions $\Gamma_j\colon \AA_{\tau_j}\to R^I$.
+increasing stopping times $\tau_0 < \cdots < \tau_n$ and functions $\Gamma_j\colon \mathcal{A}_{\tau_j}\to R^I$.
 
 Trades accumulate into a position 
 $\Delta_t = \sum_{\tau_j < t} \Gamma_j = \sum_{s < t} \Gamma_s$ where
@@ -100,15 +94,15 @@ $$
 X_t D_t = X_0 M_t - \sum_{s \le t} (C_s D_s)|_{\mathcal{A}_t},
 $$
 where $M_t$ is a vector-valued martingale measure
-($M_t = M_u|_{\AA_t}$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
-$D_t\in ba(\AA_t)$. If a money market account is available then $D_t$ can
+($M_t = M_u|_{\mathcal{A}_t}$ for $t\le u$) and $D_t$ are positive finitely-additive measures 
+$D_t\in ba(\mathcal{A}_t)$. If a money market account is available then $D_t$ can
 be chosen to be the reciprocal of its price. This is typically referred
 to as the stochastic discount.
 
 This implies
 
 $$
-X_t D_t = (X_u D_u + \sum_{t < s \le u} C_s D_s)|_{\AA_t}\quad\text{(1)}
+X_t D_t = (X_u D_u + \sum_{t < s \le u} C_s D_s)|_{\mathcal{A}_t}\quad\text{(1)}
 $$
 
 In the case of zero cash flows this says $(X_t D_t)$
@@ -120,7 +114,7 @@ value of future cash flows (Graham-Todd).
 A consequence of (1) and our accounting definitions is
 
 $$
-V_t D_t = (V_u D_u + \sum_{t < s \le u} A_u D_u)|_{\AA_t}\quad\text{(2)}
+V_t D_t = (V_u D_u + \sum_{t < s \le u} A_u D_u)|_{\mathcal{A}_t}\quad\text{(2)}
 $$
 
 Note how price in (1) corresponds to value in (2)
@@ -135,7 +129,7 @@ increasing stopping times $\hat{\tau}_j$ then its value
 at time $t$ is determined by
 
 $$
-V_t D_t = (\sum_{\hat{\tau}_j > t} \hat{A_j} D_{\hat{\tau}_j})|_{\AA_t}.\quad\text{(3)}
+V_t D_t = (\sum_{\hat{\tau}_j > t} \hat{A_j} D_{\hat{\tau}_j})|_{\mathcal{A}_t}.\quad\text{(3)}
 $$
 
 _if_ we can find a trading strategy with $A_t - \hat{A}_j 1(t = \hat{\tau}_j) = 0$
@@ -165,17 +159,17 @@ The value at time $t$ of an option paying
 $A_\tau$ at stopping time $\tau$ is determined
 by 
 $$
-V_t D_t = (1(\tau > t) A_\tau D_\tau)|_{\AA_t}
+V_t D_t = (1(\tau > t) A_\tau D_\tau)|_{\mathcal{A}_t}
 $$
 
-So for $E\in \AA_t$ we have
+So for $E\in \mathcal{A}_t$ we have
 $$
 (V_t D_t)(E) = \sum_{u > t} \sum_{F\subseteq E\cap\{\tau = u\}} A_u(F) D_u(F)
 $$
 
-Given $E\in \AA_t$ and $u > t$ we need to produce the collections
+Given $E\in \mathcal{A}_t$ and $u > t$ we need to produce the collections
 $$
-\{F\in \AA_u\mid F\subset E\cap\{\tau = u\}\}
+\{F\in \mathcal{A}_u\mid F\subset E\cap\{\tau = u\}\}
 $$
 to calculate the sum/product.
 
