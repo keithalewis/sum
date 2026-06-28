@@ -16,10 +16,6 @@ def choose(n: Int, k: Int): Int = {
   }
 }
 
-// 0, 1, 2, ...
-//def Time() = Iterator.from(0)
-
-
 
 /**
   * Atom representing V_t = v.
@@ -39,58 +35,53 @@ def D(t: Time): Function = {
   (A: Atom) => choose(A.t.value, A.v) * math.pow(0.5, A.t.value)
 }
 
-// Atoms of A_u contained in E.
-def Atoms(E: Atom, u: Time): Iterable[Atom] = {
-  // require E is an atom of A_t, and t < u
-  // returns the atoms of A_u that entail E at time u
+// Atoms F in A_u with F subset E.
+def EntailingAtoms(E: Atom, u: Time): Iterable[Atom] = {
+  require(u > E.t, "need u > E.t")
   (E.v to E.v + u - E.t).map(k => Atom(t = u, v = k)).toIterable
+}
+
+// Atoms in the event {tau = u}.
+def StoppingAtoms(tau: StoppingTime, u: Time): Set[Atom] =
+  tau.collectFirst { case (`u`, atoms) => atoms.toSet }.getOrElse(Set.empty)
+
+// {F in A_u | F subset E cap {tau = u}}
+def Atoms(E: Atom, u: Time, tau: StoppingTime): Iterable[Atom] = {
+  val stopU = StoppingAtoms(tau, u)
+  EntailingAtoms(E, u).filter(stopU.contains)
 }
 
 // (A_u D_u)|A_t
 def Value(u: Time, A: Function, D: Measure): Measure = {
   // require E is an atom of A_t, and t < u
-  (E: Atom) => Atoms(E, u).iterator.map(e => A(e) * D(e)).sum // sum over atoms of A_u that entail E at time u
+  (E: Atom) => EntailingAtoms(E, u).iterator.map(e => A(e) * D(e)).sum // sum over atoms of A_u that entail E at time u
 }
 
 // (1(tau > t) A_tau D_tau)|A_t
+def StoppedValue(tau: StoppingTime, A: Function, D: Measure): Measure =
+  (E: Atom) =>
+    tau.iterator
+      .filter { case (u, _) => u > E.t }
+      .flatMap { case (u, _) => Atoms(E, u, tau).iterator.map(F => A(F) * D(F)) }
+      .sum
 
 @main def run(): Unit =
   println(choose(5, 3))
 
-  var atoms = Atoms(Atom(t = Time(2), v = 1), Time(4))
-  atoms.map(x => println(s"Atoms: t=${x.t.value}, v=${x.v}"))
+  val e = Atom(t = Time(2), v = 1)
+  val atoms = EntailingAtoms(e, Time(4))
+  atoms.foreach(x => println(s"Atoms: t=${x.t.value}, v=${x.v}"))
   var d = D(Time(4))(Atom(t = Time(4), v = 2))
   println(s"D(4)(Atom(4,2)) = $d")
   def A(a: Atom): Double = a.v.toDouble
-  var value = Value(Time(4), A, D)
-  println(value(Atom(t = Time(2), v = 1)))
+  val value = Value(Time(4), A, D(Time(4)))
+  println(value(e))
 
-/*
+  val tau: StoppingTime = Seq(
+    (Time(3), Iterable(Atom(Time(3), 2), Atom(Time(3), 3))),
+    (Time(4), Iterable(Atom(Time(4), 3), Atom(Time(4), 4), Atom(Time(4), 5)))
+  )
+  def discount(a: Atom): Double = D(a.t)(a)
+  val stopped = StoppedValue(tau, A, discount)
+  println(stopped(e))
 
-
-def partitionBy[A, K](s: Set[A])(f: A => K): Set[Set[A]] =
-  s.groupBy(f).values.map(_.toSet).toSet
-
-def classesByKey[A, K](s: Set[A])(f: A => K): Map[K, Set[A]] =
-  s.groupBy(f).view.mapValues(_.toSet).toMap
-
-extension [A, B](f: A => B)
-  def zipWith(g: A => B)(op: (B, B) => B): A => B =
-    a => op(f(a), g(a))
-
-// val h2 = f.zipWith(g)(_ + _)
-
-import scala.annotation.targetName
-
-extension [A, B](f: A => B)
-// JVM name for interop
-@targetName("pointwiseCombine")
-infix def <+>(g: A => B)(using op: (B, B) => B): A => B =
-a => op(f(a), g(a))
-
-//Common symbols you can use in operator names include:
-//+ - * / % ^ & | ! = < > : ? ~ \
-
-@main def run(): Unit =
-  println(choose(50, 30))
-*/
